@@ -16,10 +16,10 @@ class Constants {
   static const String IMAGES_URL = "https://ringy.jp:22000/images/chatImages/";
 
 
-  // static const int messageTypeMessage = 1;
-  // static const int messageTypeFile = 1;
-  // static const int messageTypeImage = 1;
-  // static const int messageTypeVideo = 1;
+  static const int connectPage = 0;
+  static const int friendsPage = 1;
+  static const int invitePage = 2;
+  static const int searchPage = 3;
   // static const int messageTypeAudio = 1;
   // static const int messageTypeLocation = 1;
 }

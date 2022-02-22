@@ -17,9 +17,9 @@ class O2OUsers extends StatelessWidget {
           elevation: 0,
           centerTitle: true,
           backgroundColor: RingyColors.lightWhite,
-          title: const  Text(
+          title:  Text(
             'Chat',
-            style: TextStyle(fontWeight: FontWeight.bold,color: Colors.blue),
+            style: TextStyle(fontWeight: FontWeight.bold,color: RingyColors.blue),
           ),
         ),
         body: _buildBody(context));

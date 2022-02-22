@@ -7,6 +7,8 @@ import 'package:ringy_flutter/ringy/presentation/home/chat/o2ochat/o2o_users/wid
 import 'package:ringy_flutter/ringy/resources/colors.dart';
 import 'dart:developer';
 
+import 'connect/screens/connect_page.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -34,9 +36,7 @@ class _HomePageState extends State<HomePage> {
           child: Text('Rings'),
         );
       case 4:
-        return const Center(
-          child: Text('Connects'),
-        );
+        return  ConnectPage();
       default:
         return ErrorRetryWidget("error!", () => {
         });

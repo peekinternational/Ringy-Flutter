@@ -23,24 +23,4 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
     print(result);
     emit(result.fold((l) => ChatListErrorState(), (r) => ChatListLoadedState(chats: r)));
   }
-
-
-
-
-
-  // @override
-  // Stream<ChatListState> mapEventToState(
-  //   ChatListEvent event,
-  // ) async* {
-  //   if (event is GetChatsEvent) {
-  //     yield ChatsLoadingState();
-  //     var result = await repository.getChats();
-  //     yield result.fold((l) => ChatListErrorState(), (r) => ChatListLoadedState(chats: r));
-  //     // if (result.isLeft()) {
-  //     //   yield ChatListErrorState();
-  //     // } else {
-  //     //   yield ChatListLoadedState(posts: result.getOrElse(() => null));
-  //     // }
-  //   }
-  // }
 }
