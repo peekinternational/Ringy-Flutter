@@ -32,6 +32,7 @@ dependencies:
   flutter_svg: ^1.0.3
   auto_route: ^3.2.3+1
   dio: ^4.0.4
+  dio_http2_adapter: ^2.0.0
   velocity_x: ^3.4.0
   dartz: ^0.10.1
   get_it: ^7.2.0

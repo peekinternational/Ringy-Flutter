@@ -6,6 +6,8 @@ import 'package:ringy_flutter/ringy/domain/entities/chat_message/chat_message.da
 import 'package:ringy_flutter/ringy/infrastructure/chat_repository.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 
+import '../../connect/ring_list/ring_list_bloc.dart';
+
 part 'chat_list_event.dart';
 part 'chat_list_state.dart';
 
@@ -23,4 +25,5 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
     print(result);
     emit(result.fold((l) => ChatListErrorState(), (r) => ChatListLoadedState(chats: r)));
   }
+
 }

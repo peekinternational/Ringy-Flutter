@@ -34,7 +34,7 @@ class ConnectPage extends StatelessWidget {
   _buildAppBar() {
     return AppBar(
       elevation: 0,
-      backgroundColor: RingyColors.lightWhite,
+      backgroundColor: Colors.white,
       leading: InkWell(
         splashColor: Colors.transparent,
         onTap: () => {},
@@ -58,42 +58,49 @@ class ConnectPage extends StatelessWidget {
       centerTitle: true,
       title: Text('Connect',
           style:
-          TextStyle(color: RingyColors.blue, fontWeight: FontWeight.bold)),
+              TextStyle(color: RingyColors.blue, fontWeight: FontWeight.bold)),
     );
   }
 
   Widget _buildBody(BuildContext context) {
     return Column(
       children: [
-        Container(
-          color: RingyColors.lightWhite,
-          padding: const EdgeInsets.all(14),
-          height: 75,
-          child: Row(
-            children: [
-              _buildConnectView(
-                  "assets/images/connect_friend_icon.svg", "Connect", 0),
-              const VerticalDivider(thickness: 0.7),
-              _buildConnectView("assets/images/friends_icon.svg", "Friends", 1),
-              const VerticalDivider(thickness: 0.7),
-              _buildConnectView("assets/images/invite_icon.svg", "Invite", 2),
-              const VerticalDivider(thickness: 0.7),
-              _buildConnectView("assets/images/search_icon.svg", "Search", 3),
-            ],
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(15.0),
+            topRight: Radius.circular(15.0),
+          ),
+          child: Container(
+            color: RingyColors.lightWhite,
+            padding: const EdgeInsets.all(14),
+            height: 75,
+            child: Row(
+              children: [
+                _buildConnectView(
+                    "assets/images/connect_friend_icon.svg", "Connect", 0),
+                const VerticalDivider(thickness: 0.7),
+                _buildConnectView(
+                    "assets/images/friends_icon.svg", "Friends", 1),
+                const VerticalDivider(thickness: 0.7),
+                _buildConnectView("assets/images/invite_icon.svg", "Invite", 2),
+                const VerticalDivider(thickness: 0.7),
+                _buildConnectView("assets/images/search_icon.svg", "Search", 3),
+              ],
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ),
           ),
         ),
         BlocBuilder<ConnectPagesCubit, ConnectPagesInitial>(
           builder: (context, state) {
             return Expanded(
-              child: state.pageValue == Constants.connectPage ?
-              const ConnectScreen() :
-              state.pageValue == Constants.friendsPage ?
-              const FriendsScreen() :
-              state.pageValue == Constants.invitePage ?
-              const InviteScreen() :
-              const SearchScreen(),
+              child: state.pageValue == Constants.connectPage
+                  ? const ConnectScreen()
+                  : state.pageValue == Constants.friendsPage
+                      ? const FriendsScreen()
+                      : state.pageValue == Constants.invitePage
+                          ? const InviteScreen()
+                          : const SearchScreen(),
             );
           },
         )
@@ -107,8 +114,7 @@ class ConnectPage extends StatelessWidget {
         return Column(
           children: [
             InkWell(
-              onTap: () =>
-              {
+              onTap: () => {
                 BlocProvider.of<ConnectPagesCubit>(context).changePage(position)
               },
               child: Column(
@@ -117,12 +123,13 @@ class ConnectPage extends StatelessWidget {
                     imgUrl,
                     width: 24,
                     height: 24,
-                    color:
-                    position == state.pageValue
+                    color: position == state.pageValue
                         ? selectedColor
                         : unSelectedColor,
                   ),
-                  const SizedBox(height: 6,),
+                  const SizedBox(
+                    height: 6,
+                  ),
                   Text(
                     title,
                     style: TextStyle(
@@ -138,5 +145,4 @@ class ConnectPage extends StatelessWidget {
       },
     );
   }
-
 }
