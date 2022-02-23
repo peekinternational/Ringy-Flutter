@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ringy_flutter/ringy/application/chat/chat_list_bloc/chat_list_bloc.dart';
 import 'package:ringy_flutter/ringy/domain/entities/chat_message/chat_message.dart';
+import 'package:ringy_flutter/ringy/presentation/core/widgets/encryption_utils.dart';
 import 'package:ringy_flutter/ringy/presentation/core/widgets/error_retry_widget.dart';
 import 'package:ringy_flutter/ringy/resources/colors.dart';
 import 'package:ringy_flutter/ringy/resources/constants.dart';
@@ -256,7 +257,7 @@ class ChatScreen extends StatelessWidget {
 
   Widget _buildNormalMessage(List<ChatModel> messages, int index) {
     return Text(
-      _decrypt(
+      EncryptData.decryptAES(
           messages[index].message.toString(), messages[index].senderId?.id),
       style: const TextStyle(fontSize: 15),
     );
@@ -302,14 +303,7 @@ class ChatScreen extends StatelessWidget {
   }
 }
 
-String _decrypt(String encryptedMessage, String? s) {
-  final plainText = encryptedMessage;
-  final key = encrypt.Key.fromUtf8(s!);
-  final iv = encrypt.IV.fromLength(16);
+// Decrypt data
 
-  final encrypter = encrypt.Encrypter(encrypt.AES(key));
 
-  final encrypted = encrypter.encrypt(plainText, iv: iv);
-  final decrypted = encrypter.decrypt(encrypted, iv: iv);
-  return decrypted;
-}
+
