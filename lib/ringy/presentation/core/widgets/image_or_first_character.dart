@@ -4,48 +4,75 @@ import 'package:ringy_flutter/ringy/resources/colors.dart';
 import '../../../infrastructure/API/api_content.dart';
 
 class ImageOrFirstCharacter extends StatelessWidget {
-  int radius;
-  String imageUrl;
-  String name;
+  final int radius;
+  final String imageUrl;
+  final String name;
+  final bool isLock;
+  final bool isPublic;
 
-  ImageOrFirstCharacter(
-      {Key? key,
-      required this.radius,
-      required this.imageUrl,
-      required this.name})
-      : super(key: key);
+  const ImageOrFirstCharacter({
+    Key? key,
+    this.radius = 22,
+    required this.imageUrl,
+    required this.name,
+    this.isLock = false,
+    this.isPublic = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: radius + 1,
       backgroundColor: RingyColors.primaryColor,
-      child: CircleAvatar(
-        backgroundColor: RingyColors.lightWhite,
-        child: imageUrl == ""
-            ? name == ""
-                ? const Text("")
-                : Center(
-                    child: Text(
-                      getFirstTwoCharOfUserName(name),
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircleAvatar(
+            backgroundColor: RingyColors.lightWhite,
+            child: imageUrl == ""
+                ? name == ""
+                    ? const Text("")
+                    : Center(
+                        child: Text(
+                          getFirstTwoCharOfUserName(name),
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      )
+                : ClipOval(
+                    child: Image.network(
+                      APIContent.ImageUrl + imageUrl,
+                      fit: BoxFit.cover,
+                      width: 100,
+                      height: 100,
                     ),
-                  )
-            : ClipOval(
-                child: Image.network(
-                  APIContent.ImageUrl + imageUrl,
-                  fit: BoxFit.cover,
-                  width: 100,
-                  height: 100,
-                ),
-              ),
-        radius: 25,
+                  ),
+            radius: 25,
+          ),
+          if(isPublic) Padding(
+            padding: const EdgeInsets.all(0),
+            child: Align(
+                alignment: Alignment.bottomRight,
+                child:CircleAvatar(
+                    backgroundColor: RingyColors.lightWhite,
+                    radius: 9,
+                    child: Icon(Icons.ac_unit_rounded, size: 14,color: RingyColors.primaryColor))),
+          ),
+          if(isLock) Padding(
+            padding: const EdgeInsets.all(0),
+            child: Align(
+                alignment: Alignment.bottomLeft,
+                child: CircleAvatar(
+                  backgroundColor: RingyColors.lightWhite,
+                    radius: 9,
+                    child: Icon(Icons.lock_open, size: 14,color: RingyColors.blue,))),
+          )
+        ],
       ),
     );
   }
 
-   String getFirstTwoCharOfUserName(String s1) {
+  String getFirstTwoCharOfUserName(String s1) {
     String finalStr = "";
     String lastStr = "";
     String firstStr = "";
@@ -61,7 +88,6 @@ class ImageOrFirstCharacter extends StatelessWidget {
           firstStr = f2[0];
 
           finalStr = firstStr.toUpperCase() + lastStr.toUpperCase();
-
         } else {
           finalStr = s1[0].toUpperCase();
         }

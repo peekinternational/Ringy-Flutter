@@ -20,7 +20,7 @@ class RingItemTile extends StatelessWidget {
         style: TextStyle(color: RingyColors.primaryColor),
       ),
       leading: ImageOrFirstCharacter(
-          radius: 25, imageUrl: model.pImage, name: model.ringName),
+          radius: 25, imageUrl: model.pImage, name: model.ringName,isLock: false,isPublic: false,),
       trailing: SvgPicture.asset(
         "assets/images/scan_qr_icon.svg",
       ),
