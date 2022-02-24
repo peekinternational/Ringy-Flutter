@@ -25,7 +25,7 @@ class _$AppRouter extends RootStackRouter {
       final args = routeData.argsAs<ChatScreenRouteArgs>();
       return MaterialPageX<dynamic>(
           routeData: routeData,
-          child: ChatScreen(args.userName, key: args.key));
+          child: ChatScreen(args.dataTravel, key: args.key));
     }
   };
 
@@ -47,23 +47,23 @@ class HomeRoute extends PageRouteInfo<void> {
 /// generated route for
 /// [ChatScreen]
 class ChatScreenRoute extends PageRouteInfo<ChatScreenRouteArgs> {
-  ChatScreenRoute({required String userName, Key? key})
+  ChatScreenRoute({required TmpDataTravel dataTravel, Key? key})
       : super(ChatScreenRoute.name,
             path: '/chat-screen',
-            args: ChatScreenRouteArgs(userName: userName, key: key));
+            args: ChatScreenRouteArgs(dataTravel: dataTravel, key: key));
 
   static const String name = 'ChatScreenRoute';
 }
 
 class ChatScreenRouteArgs {
-  const ChatScreenRouteArgs({required this.userName, this.key});
+  const ChatScreenRouteArgs({required this.dataTravel, this.key});
 
-  final String userName;
+  final TmpDataTravel dataTravel;
 
   final Key? key;
 
   @override
   String toString() {
-    return 'ChatScreenRouteArgs{userName: $userName, key: $key}';
+    return 'ChatScreenRouteArgs{userName: $dataTravel, key: $key}';
   }
 }

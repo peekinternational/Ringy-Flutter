@@ -72,9 +72,7 @@ class ConnectScreen extends StatelessWidget {
               shrinkWrap: true,
               itemCount: list.length,
               separatorBuilder: (BuildContext context, int index) =>
-              const Divider(
-
-              ),
+              const Divider(),
               itemBuilder: (BuildContext context, int index) {
                 return RingItemTile(model:list[index]);
               },

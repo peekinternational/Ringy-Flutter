@@ -5,6 +5,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:ringy_flutter/ringy/domain/entities/chat_message/chat_message.dart';
+import 'package:ringy_flutter/ringy/domain/entities/chat_message/user_model.dart';
 import 'package:ringy_flutter/ringy/domain/i_facade.dart';
 import 'package:ringy_flutter/ringy/infrastructure/API/api_content.dart';
 import 'package:ringy_flutter/ringy/infrastructure/API/dio_client.dart';
@@ -15,13 +16,14 @@ class ApiDataSource implements IFacade {
   Dio dio = DioClient.instance.getDioClient();
 
   @override
-  Future<Either<String, List<ChatModel>>> getChats() async {
+  Future<Either<String, List<ChatModel>>> getChats(
+      String senderId, String receiverId ,String limit) async {
     try {
-      String sId = "6152f067d8eda876c8d49cbe";
+    /*  String sId = "6152f067d8eda876c8d49cbe";
       String rId = "61aef7d8d5d2971bb4c8b890";
-      String limit = "100";
+      String limit = "100";*/
       String pId = "5d4c07fb030f5d0600bf5c03";
-      String url = APIContent.O2O_CHAT_FETCH +"/" + sId +"/" + rId +"/" +limit +"/" +pId
+      String url = APIContent.O2O_CHAT_FETCH +"/" + senderId +"/" + receiverId +"/" +limit +"/" +pId
           +"/0";
       Response response;
       response = await dio.get(
@@ -57,7 +59,22 @@ class ApiDataSource implements IFacade {
     }
   }
 
+  @override
+  Future<Either<String, List<UsersModel>>> getUserList(
+      String projectId,
+      String uID) async {
+   // @GET("/{url}/{uID}/{pId}/0/0/0")
+    try {
+      String url = APIContent.GetO2O_Users +"/" +uID +"/" + projectId +"/0/0/0";
 
+      Response response = await dio.get(url);
+
+      Iterable jsonChat = response.data;
+      return right(jsonChat.map((user) => UsersModel.fromJson(user)).toList());
+    } catch (e) {
+      return left(e.toString());
+    }
+  }
 
   @override
   Future<Either<String, List<GetUserRingModel>>> getRingList(
@@ -76,6 +93,22 @@ class ApiDataSource implements IFacade {
     } catch (e) {
       return left(e.toString());
     }
+  }
+
+  @override
+  Future<Either<String, List<UsersModel>>> getUsersList(String projectId, String userId)
+    async {
+      // @GET("/{url}/{uID}/{pId}/0/0/0")
+      try {
+        String url = APIContent.GetO2O_Users +"/" +userId +"/" + projectId +"/0/0/0";
+
+        Response response = await dio.get(url);
+
+        Iterable jsonChat = response.data;
+        return right(jsonChat.map((user) => UsersModel.fromJson(user)).toList());
+      } catch (e) {
+        return left(e.toString());
+      }
   }
 
 

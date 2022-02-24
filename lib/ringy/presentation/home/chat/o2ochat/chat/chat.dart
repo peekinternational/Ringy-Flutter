@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ringy_flutter/ringy/application/chat/chat_list_bloc/chat_list_bloc.dart';
 import 'package:ringy_flutter/ringy/domain/entities/chat_message/chat_message.dart';
+import 'package:ringy_flutter/ringy/presentation/core/utils/data_travel_model.dart';
 import 'package:ringy_flutter/ringy/presentation/core/widgets/encryption_utils.dart';
 import 'package:ringy_flutter/ringy/presentation/core/widgets/error_retry_widget.dart';
 import 'package:ringy_flutter/ringy/resources/colors.dart';
@@ -16,29 +17,34 @@ import 'package:ringy_flutter/ringy/resources/constants.dart';
 
 import '../../../../../../injections.dart';
 import '../../../../../application/chat/send_chat/send_chat_bloc.dart';
+import 'message_views_widgets/audio_message_view.dart';
+import 'message_views_widgets/image_message_view.dart';
+import 'message_views_widgets/normal_message_view.dart';
+import 'message_views_widgets/video_message_view.dart';
 
 class ChatScreen extends StatelessWidget {
-  String userName;
+  TmpDataTravel dataTravel;
 
-  ChatScreen(this.userName, {Key? key}) : super(key: key);
-ScrollController scrollController = ScrollController();
+
+  ChatScreen(this.dataTravel, {Key? key}) : super(key: key);
+  ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     final ChatListBloc chatListBloc = serviceLocator<ChatListBloc>();
     return BlocProvider<ChatListBloc>
       (
-        create: (context) => chatListBloc..add(GetChatsEvent()),
+        create: (context) => chatListBloc..add(GetChatsEvent(senderId:Constants.MY_ID,receiverId: dataTravel.recieverId,limit: "100")),
         child: BlocBuilder<ChatListBloc, ChatListState>(
             builder: (context, ChatListState state) {
           if (state is ChatListLoadedState) {
-            return _buildMainBody(context, userName, state.chats,chatListBloc);
+            return _buildMainBody(context, dataTravel, state.chats,chatListBloc);
           } else if (state is ChatsLoadingState) {
-            return  _buildLoadingBody(context, userName);
+            return  _buildLoadingBody(context, dataTravel);
           } else if (state is ChatListErrorState) {
             return ErrorRetryWidget(
                 "Error while fetching Chat",
                 () => {
-                      chatListBloc..add(GetChatsEvent()),
+                      chatListBloc..add(GetChatsEvent(senderId:Constants.MY_ID,receiverId: dataTravel.recieverId,limit: "100")),
                     });
           }
           return const Center(child
@@ -47,30 +53,30 @@ ScrollController scrollController = ScrollController();
   }
 
   Widget _buildMainBody(
-      BuildContext context, String userName, List<ChatModel> chats, ChatListBloc chatListBloc) {
+      BuildContext context, TmpDataTravel dataTravel, List<ChatModel> chats, ChatListBloc chatListBloc) {
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
           automaticallyImplyLeading: false,
           backgroundColor: RingyColors.lightWhite,
-          flexibleSpace: _buildAppBarSafeArea(context, userName),
+          flexibleSpace: _buildAppBarSafeArea(context, dataTravel),
         ),
         body: _buildBody(context, chats,chatListBloc));
   }
 
   Widget _buildLoadingBody(
-      BuildContext context, String userName) {
+      BuildContext context, TmpDataTravel userName) {
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
           automaticallyImplyLeading: false,
           backgroundColor: RingyColors.lightWhite,
-          flexibleSpace: _buildAppBarSafeArea(context, userName),
+          flexibleSpace: _buildAppBarSafeArea(context, dataTravel),
         ),
         body: const Center(child: CircularProgressIndicator(),));
   }
 
-  Widget _buildAppBarSafeArea(BuildContext context, String userName) {
+  Widget _buildAppBarSafeArea(BuildContext context, TmpDataTravel dataTravel) {
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.only(right: 16),
@@ -103,7 +109,7 @@ ScrollController scrollController = ScrollController();
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    userName,
+                    dataTravel.name,
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w600),
                   ),
@@ -254,65 +260,25 @@ ScrollController scrollController = ScrollController();
                         : Colors.blue[200]),
                   ),
                   padding: const EdgeInsets.all(14),
-                  child:
-                      // messages[index].messageType == Constants.VIDEO_MSG
-                      //     ? _buildVideoMessage(messages, index)
-                      //     :
-                      messages[index].messageType == Constants.IMAGE_MSG
-                          ? _buildImageMessage(messages, index, context)
-                          : _buildNormalMessage(messages, index)),
+                  child: messages[index].messageType == Constants.VIDEO_MSG
+                      ? VideoMessageView(messagesList: messages, index: index)
+                      : messages[index].messageType == Constants.IMAGE_MSG
+                      ? ImageMessageView(
+                      messagesList: messages, index: index)
+                      : messages[index].messageType == Constants.AUDIO_MSG
+                      ? AudioMessageView(
+                    messagesList: messages,
+                    index: index,
+                  )
+                      : NormalMessageView(
+                    messagesList: messages,
+                    index: index,
+                  )),
             ),
           ),
         );
       },
     );
-  }
-
-  Widget _buildNormalMessage(List<ChatModel> messages, int index) {
-    return Text(
-      EncryptData.decryptAES(
-          messages[index].message.toString(), messages[index].senderId?.id),
-      style: const TextStyle(fontSize: 15),
-    );
-  }
-
-  Widget _buildImageMessage(
-      List<ChatModel> messages, int index, BuildContext context) {
-    return messages[index].message != null
-        ? CachedNetworkImage(
-            progressIndicatorBuilder: (context, url, progress) => Center(
-              child: CircularProgressIndicator(
-                value: progress.progress,
-              ),
-            ),
-            width: 200,
-            fit: BoxFit.cover,
-            // height: !kIsWeb ? 130 : context.screenSize.height / 2 + 100,
-            imageUrl: "https://randomuser.me/api/portraits/men/5.jpg",
-          )
-        : Image.asset(
-            "assets/images/ic_placeholder.png",
-            fit: BoxFit.cover,
-          );
-  }
-
-  Widget _buildVideoMessage(List<ChatModel> messages, int index) {
-    return messages[index].message != null
-        ? CachedNetworkImage(
-            progressIndicatorBuilder: (context, url, progress) => Center(
-              child: CircularProgressIndicator(
-                value: progress.progress,
-              ),
-            ),
-            // width: MediaQuery.of(context).size.width,
-            fit: BoxFit.cover,
-            // height: !kIsWeb ? 130 : context.screenSize.height / 2 + 100,
-            imageUrl: Constants.IMAGES_URL + messages[index].message.toString(),
-          )
-        : Image.asset(
-            "assets/images/ic_placeholder.png",
-            fit: BoxFit.cover,
-          );
   }
 
   void sendSimpleChat(BuildContext context, String msgEntered, ChatListBloc chatListBloc, List<ChatModel> messages) {
