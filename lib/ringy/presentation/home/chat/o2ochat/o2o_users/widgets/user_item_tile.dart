@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ringy_flutter/ringy/domain/entities/chat_message/user_model.dart';
-import 'package:ringy_flutter/ringy/domain/entities/connect/get_user_ring.dart';
-import 'package:ringy_flutter/ringy/infrastructure/API/api_content.dart';
+
 import 'package:ringy_flutter/ringy/presentation/core/utils/data_travel_model.dart';
+import 'package:ringy_flutter/ringy/presentation/core/utils/helper_class.dart';
 import 'package:ringy_flutter/ringy/presentation/core/widgets/encryption_utils.dart';
 import 'package:ringy_flutter/ringy/presentation/home/connect/screens/pages/widgets/image_or_first_character.dart';
 import 'package:ringy_flutter/ringy/resources/colors.dart';
@@ -34,7 +34,7 @@ class UserItemTile extends StatelessWidget {
         ),
         leading: ImageOrFirstCharacter(
             radius: 22, imageUrl: model.pImage, name: model.userName),
-        trailing: const Text("12:00"),
+        trailing:  Text(model.latestMsg==null?"":HelperClass.getFormatedDate(model.latestMsg!.createdAt)),
       ),
     );
   }

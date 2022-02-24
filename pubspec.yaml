@@ -43,6 +43,7 @@ dependencies:
   bloc_concurrency: ^0.2.0
   encrypt: ^5.0.1
   cached_network_image: ^3.2.0
+  floor: ^1.2.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -55,6 +56,7 @@ dev_dependencies:
   auto_route_generator: ^3.2.3
   build_runner: ^2.1.7
   flutter_bloc: ^8.0.1
+  floor_generator: ^1.2.0
 
 
   # The "flutter_lints" package below contains a set of recommended lints to

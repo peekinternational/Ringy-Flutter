@@ -6,6 +6,7 @@ import 'package:ringy_flutter/ringy/domain/entities/chat_message/user_model.dart
 import 'package:ringy_flutter/ringy/presentation/home/chat/o2ochat/o2o_users/widgets/user_item_tile.dart';
 import 'package:ringy_flutter/ringy/resources/colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ringy_flutter/ringy/resources/constants.dart';
 import '../../../../../../../injections.dart';
 import '../../../../../core/widgets/error_retry_widget.dart';
 
@@ -16,7 +17,7 @@ class O2OUsers extends StatelessWidget {
   Widget build(BuildContext context) {
     final UserListBloc userListBloc = serviceLocator<UserListBloc>();
     var projectId ="5d4c07fb030f5d0600bf5c03";
-    var myId ="6152f067d8eda876c8d49cbe";
+    var myId =Constants.MY_ID;
     return Scaffold(
         appBar: AppBar(
           systemOverlayStyle: SystemUiOverlayStyle(

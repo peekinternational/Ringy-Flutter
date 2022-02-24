@@ -13,8 +13,9 @@ class Constants {
   static const int STICKER_MSG = 8;
 
 
-  static const String IMAGES_URL = "https://ringy.jp:22000/images/chatImages/";
+
   static const String MY_ID = "6152f067d8eda876c8d49cbe";
+  static const String projectId = "5d4c07fb030f5d0600bf5c03";
 
 
   static const int connectPage = 0;
