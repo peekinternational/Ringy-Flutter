@@ -1,4 +1,8 @@
+import 'package:floor/floor.dart';
+
+@entity
 class UsersModel {
+  @primaryKey
   String sId="";
   String userName="";
   String qrRing="";
