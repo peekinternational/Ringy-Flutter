@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_route/src/router/auto_router_x.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
@@ -13,22 +15,23 @@ import 'package:ringy_flutter/ringy/resources/colors.dart';
 import 'package:ringy_flutter/ringy/resources/constants.dart';
 
 import '../../../../../../injections.dart';
+import '../../../../../application/chat/send_chat/send_chat_bloc.dart';
 
 class ChatScreen extends StatelessWidget {
   String userName;
 
   ChatScreen(this.userName, {Key? key}) : super(key: key);
-
+ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     final ChatListBloc chatListBloc = serviceLocator<ChatListBloc>();
-
-    return BlocProvider<ChatListBloc>(
+    return BlocProvider<ChatListBloc>
+      (
         create: (context) => chatListBloc..add(GetChatsEvent()),
         child: BlocBuilder<ChatListBloc, ChatListState>(
             builder: (context, ChatListState state) {
           if (state is ChatListLoadedState) {
-            return _buildMainBody(context, userName, state.chats);
+            return _buildMainBody(context, userName, state.chats,chatListBloc);
           } else if (state is ChatsLoadingState) {
             return  _buildLoadingBody(context, userName);
           } else if (state is ChatListErrorState) {
@@ -44,7 +47,7 @@ class ChatScreen extends StatelessWidget {
   }
 
   Widget _buildMainBody(
-      BuildContext context, String userName, List<ChatModel> chats) {
+      BuildContext context, String userName, List<ChatModel> chats, ChatListBloc chatListBloc) {
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -52,7 +55,7 @@ class ChatScreen extends StatelessWidget {
           backgroundColor: RingyColors.lightWhite,
           flexibleSpace: _buildAppBarSafeArea(context, userName),
         ),
-        body: _buildBody(context, chats));
+        body: _buildBody(context, chats,chatListBloc));
   }
 
   Widget _buildLoadingBody(
@@ -124,88 +127,98 @@ class ChatScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, List<ChatModel> messages) {
+  Widget _buildBody(BuildContext context, List<ChatModel> messages, ChatListBloc chatListBloc) {
     return Column(
       children: [
         Expanded(child: _buildListMessage(context, messages)),
-        _buildInput(context, messages),
+        _buildInput(context, messages,chatListBloc),
       ],
     );
   }
 
-  Widget _buildInput(BuildContext context, List<ChatModel> messages) {
+  Widget _buildInput(BuildContext context, List<ChatModel> messages,ChatListBloc chatListBloc) {
     var msgEntered = "";
-    return Stack(
-      children: <Widget>[
-        Align(
-          alignment: Alignment.bottomLeft,
-          child: Container(
-            padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
-            height: 60,
-            width: double.infinity,
-            color: Colors.white,
-            child: Row(
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    height: 30,
-                    width: 30,
-                    decoration: BoxDecoration(
-                      color: Colors.lightBlue,
-                      borderRadius: BorderRadius.circular(30),
+    final SendChatBloc sendChatObj = serviceLocator<SendChatBloc>();
+    return BlocProvider<SendChatBloc>(
+        create: (context) => sendChatObj,
+        child: BlocBuilder<SendChatBloc, SendChatState>(
+            builder: (context, SendChatState state) {
+                return  Stack(
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
+                        height: 60,
+                        width: double.infinity,
+                        color: Colors.white,
+                        child: Row(
+                          children: <Widget>[
+                            GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                height: 30,
+                                width: 30,
+                                decoration: BoxDecoration(
+                                  color: Colors.lightBlue,
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: const Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 15,
+                            ),
+                            Expanded(
+                              child: TextField(
+                                decoration: const InputDecoration(
+                                  hintText: "Write message...",
+                                  hintStyle: TextStyle(color: Colors.black54),
+                                  border: InputBorder.none,
+                                ),
+                                onChanged: (text) {
+                                  msgEntered = text;
+                                },
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 15,
+                            ),
+                            FloatingActionButton(
+                              onPressed: () {
+                                sendSimpleChat(context,msgEntered,chatListBloc,messages);
+                                scrollController.animateTo(scrollController.position.maxScrollExtent+1000, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+
+                                },
+                              child: const Icon(
+                                Icons.send,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                              backgroundColor: Colors.blue,
+                              elevation: 0,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.add,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 15,
-                ),
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      hintText: "Write message...",
-                      hintStyle: TextStyle(color: Colors.black54),
-                      border: InputBorder.none,
-                    ),
-                    onChanged: (text) {
-                      msgEntered = text;
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  width: 15,
-                ),
-                FloatingActionButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("Coming Soon!"),
-                    ));
-                  },
-                  child: const Icon(
-                    Icons.send,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                  backgroundColor: Colors.blue,
-                  elevation: 0,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
+                  ],
+                );
+            }
+
+        ));
   }
 
   Widget _buildListMessage(BuildContext context, List<ChatModel> messages) {
     return ListView.builder(
       itemCount: messages.length,
       shrinkWrap: true,
+      controller: scrollController,
+
       padding: const EdgeInsets.only(top: 10, bottom: 10),
       itemBuilder: (context, index) {
         return Container(
@@ -301,6 +314,50 @@ class ChatScreen extends StatelessWidget {
             fit: BoxFit.cover,
           );
   }
+
+  void sendSimpleChat(BuildContext context, String msgEntered, ChatListBloc chatListBloc, List<ChatModel> messages) {
+
+    var senderMainUserId ="6152eec97fa31675f62b8089";
+    var receiverMainUserId ="618c87dec66e4d9818bac595";
+    String sId = "6152f067d8eda876c8d49cbe";
+    String rId = "61aef7d8d5d2971bb4c8b890";
+    String pId = "5d4c07fb030f5d0600bf5c03";
+    SenderId receiverIdObj = SenderId();
+    receiverIdObj.id =rId;
+
+    SenderId senderIdObj = SenderId();
+    senderIdObj.id = sId;
+
+    ChatModel chatModel = ChatModel();
+   // chatModel.sId = "";
+    chatModel.receiverId = receiverIdObj;
+    chatModel.senderId =senderIdObj;
+    chatModel.message = EncryptData.encryptAES(msgEntered, senderIdObj.id);
+    chatModel.chatType = 0;
+    chatModel.messageType = 0;
+    chatModel.isGroup = 0;
+    chatModel.isSeen = 0;
+    chatModel.receiptStatus = 1;
+    chatModel.isDeleted = 0;
+    chatModel.projectId = pId;
+
+
+    chatModel.senderUserId = senderMainUserId;
+    chatModel.receiverUserId = receiverMainUserId;
+    messages.add(chatModel);
+    chatListBloc.add(UpdateChatsEvent(messages));
+
+
+
+
+    BlocProvider.of<SendChatBloc>(context).repository.sendMessage(chatModel);
+   /* Timer.periodic(Duration(seconds: 5), (_) {
+      // this code runs after every 5 second. Good to use for Stopwatches
+      chatListBloc.repository.getChats();
+    });*/
+
+  }
+
 }
 
 // Decrypt data

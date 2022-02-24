@@ -1,16 +1,17 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:ringy_flutter/ringy/domain/entities/chat_message/chat_message.dart';
-import 'package:ringy_flutter/ringy/domain/i_chat_facade.dart';
+import 'package:ringy_flutter/ringy/domain/i_facade.dart';
 import 'package:ringy_flutter/ringy/infrastructure/API/api_content.dart';
 import 'package:ringy_flutter/ringy/infrastructure/API/dio_client.dart';
 
 import '../../domain/entities/connect/get_user_ring.dart';
 
-class ApiDataSource implements IChatFacade {
+class ApiDataSource implements IFacade {
   Dio dio = DioClient.instance.getDioClient();
 
   @override
@@ -33,8 +34,34 @@ class ApiDataSource implements IChatFacade {
     }
   }
   @override
+  Future<Either<String, ChatModel>> sendMessage( ChatModel model) async {
+     try{
+
+     String uri ="";
+     MessageData messageData =  MessageData();
+     messageData.projectId="5d4c07fb030f5d0600bf5c03";
+     messageData.msgData = model;
+    //  uri = APIContent.GROUP_CHAT_SEND_URL;
+      uri = APIContent.CHAT_SEND_URL;
+     String json = jsonEncode(messageData.toJson());
+     print(json);
+      Response response;
+      response = await dio.post(uri,data:json);
+ //   ChatModel jsonChat =   response.data;
+
+     print(response.data);
+      return right(model);
+    } catch (e) {
+       print(e.toString());
+      return left(e.toString());
+    }
+  }
+
+
+
+  @override
   Future<Either<String, List<GetUserRingModel>>> getRingList(
- String projectId,
+  String projectId,
   String user_id) async {
 
     try {

@@ -20,6 +20,7 @@ class GetUserRing
      'code': code,
      'message': message,
      'ringData': ringData,
+
    };
 
 }

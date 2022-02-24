@@ -9,14 +9,18 @@ class EncryptData{
 
   static String encryptAES(String mMessage, String? aesKey){
 
-    final iv1 = aesKey?.substring(0, 16);
+    try {
+      final iv1 = aesKey?.substring(0, 16);
 
-    final key = Key.fromUtf8(aesKey!);
-    final iv = IV.fromUtf8(iv1!);
-    final aesEncrypter = Encrypter(AES(key, mode: AESMode.cbc));
+      final key = Key.fromUtf8(aesKey!);
+      final iv = IV.fromUtf8(iv1!);
+      final aesEncrypter = Encrypter(AES(key, mode: AESMode.cbc));
 
-    final encrypted = aesEncrypter.encrypt(mMessage, iv: iv);
-    return encrypted.base64;
+      final encrypted = aesEncrypter.encrypt(mMessage, iv: iv);
+      return encrypted.base64;
+    }on Exception catch (e) {
+      return mMessage;
+    }
   }
 
 
