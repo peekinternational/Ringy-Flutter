@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ringy_flutter/ringy/resources/colors.dart';
 
-import '../../../../../../infrastructure/API/api_content.dart';
+import '../../../infrastructure/API/api_content.dart';
 
 class ImageOrFirstCharacter extends StatelessWidget {
   int radius;
@@ -45,7 +45,7 @@ class ImageOrFirstCharacter extends StatelessWidget {
     );
   }
 
-  static String getFirstTwoCharOfUserName(String s1) {
+   String getFirstTwoCharOfUserName(String s1) {
     String finalStr = "";
     String lastStr = "";
     String firstStr = "";
@@ -61,11 +61,9 @@ class ImageOrFirstCharacter extends StatelessWidget {
           firstStr = f2[0];
 
           finalStr = firstStr.toUpperCase() + lastStr.toUpperCase();
-          //  Log.e("SPACECHECKist", "s1: " + s1 + " finalString" + finalStr);
 
         } else {
           finalStr = s1[0].toUpperCase();
-          // Log.e("SPACECHECKscnd", "s1: " + s1 + " finalString" + finalStr);
         }
       }
     } catch (e) {
