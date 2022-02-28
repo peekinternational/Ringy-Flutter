@@ -31,9 +31,9 @@ class _$AppRouter extends RootStackRouter {
 
   @override
   List<RouteConfig> get routes => [
-        RouteConfig(HomeRoute.name, path: '/'),
-        RouteConfig(ChatScreenRoute.name, path: '/chat-screen')
-      ];
+    RouteConfig(HomeRoute.name, path: '/'),
+    RouteConfig(ChatScreenRoute.name, path: '/chat-screen')
+  ];
 }
 
 /// generated route for
@@ -49,8 +49,8 @@ class HomeRoute extends PageRouteInfo<void> {
 class ChatScreenRoute extends PageRouteInfo<ChatScreenRouteArgs> {
   ChatScreenRoute({required TmpDataTravel dataTravel, Key? key})
       : super(ChatScreenRoute.name,
-            path: '/chat-screen',
-            args: ChatScreenRouteArgs(dataTravel: dataTravel, key: key));
+      path: '/chat-screen',
+      args: ChatScreenRouteArgs(dataTravel: dataTravel, key: key));
 
   static const String name = 'ChatScreenRoute';
 }

@@ -44,11 +44,7 @@ class O2OUsers extends StatelessWidget {
                 return _buildBody(context, state.users);
               }
               else{
-                return ErrorRetryWidget(
-                    "Error while fetching Chat",
-                        () => {
-                          userListBloc..add(GetUsersEvent(projectId, myId)),
-                    });
+                return const Center(child: CircularProgressIndicator());
               }
             },
           ),

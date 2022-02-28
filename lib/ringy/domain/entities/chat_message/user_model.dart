@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:floor/floor.dart';
+import 'package:flutter/cupertino.dart';
 
 @entity
 class UsersModel {
-  @primaryKey
+  @PrimaryKey(autoGenerate: true)
+  int? myId;
   String sId="";
   String userName="";
   String qrRing="";
@@ -30,7 +34,8 @@ class UsersModel {
   String friendReqSenderId="";
   int usCount=-1;
   int isSeenCount=-1;
-  LatestMsg? latestMsg;
+  // @TypeConverters([LatestMsgConverter])
+  // LatestMsg? latestMsg;
   String mute="";
   String hide="";
   String block="";
@@ -39,9 +44,57 @@ class UsersModel {
   int pinStatus=-1;
   int hiddenChat=-1;
   String selectedRingId="";
+  String latestMsg="";
+  int latestMsgType= 0;
+  String latestMsgSenderId="";
+  String latestMsgCreatedAt="";
 
 
-  UsersModel();
+  UsersModel(
+     this.myId,
+      this.sId,
+      this.userName,
+      this.qrRing,
+      this.pImage,
+      this.ringName,
+      this.ringUserId,
+      this.ringValue,
+      this.isDefault,
+      this.ringStatus,
+      this.onlineStatus,
+      this.pStatus,
+      this.callStatus,
+      this.isGroup,
+      this.seenStatus,
+      this.readReceipts,
+      this.lastActiveTime,
+      this.chatWithRefId,
+      this.onlineHideStatus,
+      this.stopAudioCall,
+      this.stopVideoCall,
+      this.userId,
+      this.updatedByMsg,
+      this.friendReqId,
+      this.friendReqStatus,
+      this.friendReqSenderId,
+      this.usCount,
+      this.isSeenCount,
+      this.mute,
+      this.hide,
+      this.block,
+      this.hideChat,
+      this.unreadUserStatus,
+      this.pinStatus,
+      this.hiddenChat,
+      this.selectedRingId,
+      this.latestMsg,
+      this.latestMsgType,
+      this.latestMsgSenderId,
+      this.latestMsgCreatedAt
+  ); // UsersModel(this.myId);
+
+
+
 
   UsersModel.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
@@ -71,9 +124,9 @@ class UsersModel {
     friendReqSenderId = json['friendReqSenderId'];
     usCount = json['usCount'];
     isSeenCount = json['isSeenCount'];
-    latestMsg = json['latestMsg'] != null
-        ? new LatestMsg.fromJson(json['latestMsg'])
-        : null;
+    // latestMsg = json['latestMsg'] != null
+    //     ? new LatestMsg.fromJson(json['latestMsg'])
+    //     : null;
     mute = json['mute'];
     hide = json['hide'];
     block = json['block'];
@@ -113,9 +166,9 @@ class UsersModel {
     data['friendReqSenderId'] = this.friendReqSenderId;
     data['usCount'] = this.usCount;
     data['isSeenCount'] = this.isSeenCount;
-    if (this.latestMsg != null) {
-      data['latestMsg'] = this.latestMsg?.toJson();
-    }
+    // if (this.latestMsg != null) {
+    //   data['latestMsg'] = this.latestMsg?.toJson();
+    // }
     data['mute'] = this.mute;
     data['hide'] = this.hide;
     data['block'] = this.block;
@@ -128,103 +181,108 @@ class UsersModel {
   }
 }
 
+
+class LatestMsgConverter extends TypeConverter<LatestMsg, String> {
+
+  @override
+  LatestMsg decode(String databaseValue) {
+    final body = json.decode(databaseValue);
+    return body;
+  }
+
+  @override
+  String encode(LatestMsg value) {
+    String json = jsonEncode(value.toJson());
+    return json;
+  }
+
+  LatestMsgConverter();
+}
+
+
 class LatestMsg {
   String sId="";
   String message="";
   int messageType=0;
-  int chatType=-1;
-  int status=-1;
-  int isSeen=-1;
-  int isDeleted=-1;
-
-  int isGroup=-1;
-  int bookmarked=-1;
-  int receiptStatus=-1;
-  String fileSize="";
-  int isSeenCount=-1;
-  int hide=-1;
   String senderId="";
-  String receiverId="";
-  String projectId="";
-  String senderUserId="";
-  String receiverUserId="";
   String createdAt="";
-  String updatedAt="";
-  int iV=-1;
 
 
-  LatestMsg(
-      this.sId,
-      this.message,
-      this.messageType,
-      this.chatType,
-      this.status,
-      this.isSeen,
-      this.isDeleted,
-      this.isGroup,
-      this.bookmarked,
-      this.receiptStatus,
-      this.fileSize,
-      this.isSeenCount,
-      this.hide,
-      this.senderId,
-      this.receiverId,
-      this.projectId,
-      this.senderUserId,
-      this.receiverUserId,
-      this.createdAt,
-      this.updatedAt,
-      this.iV);
+
+  // int chatType=-1;
+  // int status=-1;
+  // int isSeen=-1;
+  // int isDeleted=-1;
+  // int isGroup=-1;
+  // int bookmarked=-1;
+  // int receiptStatus=-1;
+  // String fileSize="";
+  // int isSeenCount=-1;
+  // int hide=-1;
+  // String receiverId="";
+  // String projectId="";
+  // String senderUserId="";
+  // String receiverUserId="";
+  // String createdAt="";
+  // String updatedAt="";
+  // int iV=-1;
+
+
+
 
   LatestMsg.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     message = json['message'];
     messageType = json['messageType'];
-    chatType = json['chatType'];
-    status = json['status'];
-    isSeen = json['isSeen'];
-    isDeleted = json['isDeleted'];
-
-    isGroup = json['isGroup'];
-    bookmarked = json['bookmarked'];
-    receiptStatus = json['receiptStatus'];
-    fileSize = json['fileSize'];
-    isSeenCount = json['isSeenCount'];
-    hide = json['hide'];
     senderId = json['senderId'];
-    receiverId = json['receiverId'];
-    projectId = json['projectId'];
-    senderUserId = json['senderUserId'];
-    receiverUserId = json['receiverUserId'];
     createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
-    iV = json['__v'];
+    // chatType = json['chatType'];
+    // status = json['status'];
+    // isSeen = json['isSeen'];
+    // isDeleted = json['isDeleted'];
+    //
+    // isGroup = json['isGroup'];
+    // bookmarked = json['bookmarked'];
+    // receiptStatus = json['receiptStatus'];
+    // fileSize = json['fileSize'];
+    // isSeenCount = json['isSeenCount'];
+    // hide = json['hide'];
+    //
+    // receiverId = json['receiverId'];
+    // projectId = json['projectId'];
+    // senderUserId = json['senderUserId'];
+    // receiverUserId = json['receiverUserId'];
+    // createdAt = json['createdAt'];
+    // updatedAt = json['updatedAt'];
+    // iV = json['__v'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['_id'] = this.sId;
     data['message'] = this.message;
     data['messageType'] = this.messageType;
-    data['chatType'] = this.chatType;
-    data['status'] = this.status;
-    data['isSeen'] = this.isSeen;
-    data['isDeleted'] = this.isDeleted;
-
-    data['isGroup'] = this.isGroup;
-    data['bookmarked'] = this.bookmarked;
-    data['receiptStatus'] = this.receiptStatus;
-    data['fileSize'] = this.fileSize;
-    data['isSeenCount'] = this.isSeenCount;
-    data['hide'] = this.hide;
     data['senderId'] = this.senderId;
-    data['receiverId'] = this.receiverId;
-    data['projectId'] = this.projectId;
-    data['senderUserId'] = this.senderUserId;
-    data['receiverUserId'] = this.receiverUserId;
     data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
-    data['__v'] = this.iV;
+    // data['chatType'] = this.chatType;
+    // data['status'] = this.status;
+    // data['isSeen'] = this.isSeen;
+    // data['isDeleted'] = this.isDeleted;
+    //
+    // data['isGroup'] = this.isGroup;
+    // data['bookmarked'] = this.bookmarked;
+    // data['receiptStatus'] = this.receiptStatus;
+    // data['fileSize'] = this.fileSize;
+    // data['isSeenCount'] = this.isSeenCount;
+    // data['hide'] = this.hide;
+    //
+    // data['receiverId'] = this.receiverId;
+    // data['projectId'] = this.projectId;
+    // data['senderUserId'] = this.senderUserId;
+    // data['receiverUserId'] = this.receiverUserId;
+    // data['createdAt'] = this.createdAt;
+    // data['updatedAt'] = this.updatedAt;
+    // data['__v'] = this.iV;
     return data;
   }
 }

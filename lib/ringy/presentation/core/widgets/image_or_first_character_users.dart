@@ -5,24 +5,31 @@ import '../../../infrastructure/API/api_content.dart';
 
 class ImageOrFirstCharacterUsers extends StatelessWidget {
   int radius;
+  int maxRadius;
   String imageUrl;
   String name;
   int onlineStatus;
+  bool showOnlineStatus;
 
   ImageOrFirstCharacterUsers({
     Key? key,
     this.radius = 22,
+    this.maxRadius = 24,
     required this.imageUrl,
     required this.name,
     required this.onlineStatus,
+    this.showOnlineStatus = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var onlineStatusIconColor = onlineStatus == 0 ? Colors.red : onlineStatus ==
         1 ? Colors.green :Colors.transparent;
+    if(!showOnlineStatus){
+      onlineStatusIconColor = Colors.transparent;
+    }
     return CircleAvatar(
-      radius: radius + 1,
+      radius: maxRadius + 0,
       backgroundColor: RingyColors.primaryColor,
       child: Stack(
         alignment: Alignment.center,
@@ -47,14 +54,17 @@ class ImageOrFirstCharacterUsers extends StatelessWidget {
                 height: 100,
               ),
             ),
-            radius: 25,
+            radius: radius + 0,
           ),
            Padding(
             padding: const EdgeInsets.all(2),
             child: Align(
                 alignment: Alignment.bottomRight,
-                child: Icon(Icons.error, size: 12, color: onlineStatusIconColor)),
-          )
+                child: CircleAvatar(
+                    backgroundColor: onlineStatusIconColor,
+                    radius: 6,
+                    // Icon(Icons.error, size: 12, color: onlineStatusIconColor)),
+          )))
         ],
       ),
     );
