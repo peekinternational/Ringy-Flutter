@@ -129,24 +129,15 @@ class ApiDataSource implements IFacade {
 
 
 
-  // @override
-  // Future<Either<String, List<UsersModel>>> getUsersList(
-  //     String projectId, String userId) async {
-  //   // @GET("/{url}/{uID}/{pId}/0/0/0")
-  //   try {
-  //     String url =
-  //         APIContent.GetO2O_Users + "/" + userId + "/" + projectId + "/0/0/0";
-  //
-  //     Response response = await dio.get(url);
-  //     var db= await DBProvider.db.getDatabaseClient();
-  //     final userDao = db.userDao;
-  //     var list = await userDao.getUsers();
-  //
-  //     Iterable jsonChat = response.data;
-  //     print(list[2].myId);
-  //     return right(list);
-  //   } catch (e) {
-  //     return left(e.toString());
-  //   }
-  // }
+  @override
+  Future<Either<String, List<UsersModel>>> getUsersListFromDb() async {
+    try {
+      var db= await DBProvider.db.getDatabaseClient();
+      final userDao = db.userDao;
+      var list = await userDao.getUsers();
+      return right(list);
+    } catch (e) {
+      return left(e.toString());
+    }
+  }
 }

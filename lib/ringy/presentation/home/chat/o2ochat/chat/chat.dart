@@ -1,154 +1,71 @@
-import 'dart:async';
+import 'dart:io';
 
-import 'package:auto_route/src/router/auto_router_x.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:ringy_flutter/ringy/application/chat/chat_list_bloc/chat_list_bloc.dart';
 import 'package:ringy_flutter/ringy/domain/entities/chat_message/chat_message.dart';
-import 'package:ringy_flutter/ringy/infrastructure/API/api_content.dart';
 import 'package:ringy_flutter/ringy/presentation/core/utils/data_travel_model.dart';
 import 'package:ringy_flutter/ringy/presentation/core/widgets/encryption_utils.dart';
 import 'package:ringy_flutter/ringy/presentation/core/widgets/error_retry_widget.dart';
-import 'package:ringy_flutter/ringy/presentation/core/widgets/image_or_first_character.dart';
-import 'package:ringy_flutter/ringy/presentation/core/widgets/image_or_first_character_users.dart';
 import 'package:ringy_flutter/ringy/resources/colors.dart';
 import 'package:ringy_flutter/ringy/resources/constants.dart';
+import 'package:ringy_flutter/ringy/resources/strings_en.dart';
+import 'package:ringy_flutter/ringy/resources/styles.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 import '../../../../../../injections.dart';
 import '../../../../../application/chat/send_chat/send_chat_bloc.dart';
-import 'message_views_widgets/audio_message_view.dart';
-import 'message_views_widgets/image_message_view.dart';
-import 'message_views_widgets/normal_message_view.dart';
-import 'message_views_widgets/video_message_view.dart';
+import 'message_views_widgets/app_bar_view.dart';
+import 'message_views_widgets/chat_item_design.dart';
 
 class ChatScreen extends StatelessWidget {
-  TmpDataTravel dataTravel;
+  final TmpDataTravel dataTravel;
 
   ChatScreen(this.dataTravel, {Key? key}) : super(key: key);
-  ScrollController scrollController = ScrollController();
-  final TextEditingController _editingController =  TextEditingController();
+  final ScrollController scrollController = ScrollController();
+  final TextEditingController _editingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final ChatListBloc chatListBloc = serviceLocator<ChatListBloc>();
-    return BlocProvider<ChatListBloc>(
-        create: (context) => chatListBloc
-          ..add(GetChatsEvent(
-              senderId: Constants.MY_ID,
-              receiverId: dataTravel.recieverId,
-              limit: "100")),
-        child: BlocBuilder<ChatListBloc, ChatListState>(
-            builder: (context, ChatListState state) {
-          if (state is ChatListLoadedState) {
-            return _buildMainBody(
-                context, dataTravel, state.chats, chatListBloc);
-          } else if (state is ChatsLoadingState) {
-            return _buildLoadingBody(context, dataTravel);
-          } else if (state is ChatListErrorState) {
-            return ErrorRetryWidget(
-                "Error while fetching Chat",
-                () => {
-                      chatListBloc
-                        ..add(GetChatsEvent(
-                            senderId: Constants.MY_ID,
-                            receiverId: dataTravel.recieverId,
-                            limit: "100")),
-                    });
-          }
-          return const Center(child: CircularProgressIndicator());
-        }));
-  }
-
-  Widget _buildMainBody(BuildContext context, TmpDataTravel dataTravel,
-      List<ChatModel> chats, ChatListBloc chatListBloc) {
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
           automaticallyImplyLeading: false,
           backgroundColor: RingyColors.lightWhite,
-          flexibleSpace: _buildAppBarSafeArea(context, dataTravel),
+          flexibleSpace: AppBarChat(dataTravel),
         ),
-        body: _buildBody(context, chats, chatListBloc));
-  }
-
-  Widget _buildLoadingBody(BuildContext context, TmpDataTravel userName) {
-    return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          backgroundColor: RingyColors.lightWhite,
-          flexibleSpace: _buildAppBarSafeArea(context, dataTravel),
-        ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ));
-  }
-
-  Widget _buildAppBarSafeArea(BuildContext context, TmpDataTravel dataTravel) {
-    return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.only(right: 16),
-        child: Row(
-          children: <Widget>[
-            IconButton(
-              onPressed: () {
-                // Navigator.pop(context);
-                context.popRoute();
-              },
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(
-              width: 2,
-            ),
-            ImageOrFirstCharacterUsers(
-              imageUrl: dataTravel.image,
-              name: dataTravel.name,
-              onlineStatus:
-                  dataTravel.isOnlineHide == "0" ? dataTravel.isOnline : 2,
-              radius: 18,
-              maxRadius: 19,
-            ),
-            const SizedBox(
-              width: 12,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    dataTravel.name,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(
-                    height: 6,
-                  ),
-                  if (dataTravel.isOnlineHide == "0")
-                    Text(
-                      dataTravel.isOnline == 1 ? "Online" : "Offline",
-                      style:
-                          TextStyle(color: Colors.grey.shade600, fontSize: 13),
-                    ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.settings,
-              color: Colors.black54,
-            ),
-          ],
-        ),
-      ),
-    );
+        body: BlocProvider<ChatListBloc>(
+            create: (context) => chatListBloc
+              ..add(GetChatsEvent(
+                  senderId: Constants.MY_ID,
+                  receiverId: dataTravel.recieverId,
+                  limit: "100")),
+            child: BlocBuilder<ChatListBloc, ChatListState>(
+                builder: (context, ChatListState state) {
+              if (state is ChatListLoadedState) {
+                return _buildBody(context, state.chats, chatListBloc);
+              } else if (state is ChatsLoadingState) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is ChatListErrorState) {
+                return ErrorRetryWidget(
+                    StringsEn.errorWhileFetchingChat,
+                    () => {
+                          chatListBloc
+                            ..add(GetChatsEvent(
+                                senderId: Constants.MY_ID,
+                                receiverId: dataTravel.recieverId,
+                                limit: "100")),
+                        });
+              }
+              return const Center(child: CircularProgressIndicator());
+            })));
   }
 
   Widget _buildBody(BuildContext context, List<ChatModel> messages,
@@ -156,6 +73,7 @@ class ChatScreen extends StatelessWidget {
     return Column(
       children: [
         Expanded(child: _buildListMessage(context, messages)),
+        const Divider(height: 1),
         _buildInput(context, messages, chatListBloc),
       ],
     );
@@ -175,24 +93,21 @@ class ChatScreen extends StatelessWidget {
                 alignment: Alignment.bottomLeft,
                 child: Container(
                   padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
-                  height: 60,
+                  // height: 70,
                   width: double.infinity,
                   color: Colors.white,
                   child: Row(
                     children: <Widget>[
                       GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          height: 30,
-                          width: 30,
-                          decoration: BoxDecoration(
-                            color: Colors.lightBlue,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
+                        onTap: () {
+                          _showBottomMenu(context);
+                        },
+                        child: Transform.rotate(
+                          angle: 45,
                           child: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                            size: 20,
+                            Icons.attach_file,
+                            color: Colors.black38,
+                            size: 25,
                           ),
                         ),
                       ),
@@ -200,38 +115,67 @@ class ChatScreen extends StatelessWidget {
                         width: 15,
                       ),
                       Expanded(
-                        child: TextField(
-                          controller: _editingController,
-                          decoration: const InputDecoration(
-                            hintText: "Write message...",
-                            hintStyle: TextStyle(color: Colors.black54),
-                            border: InputBorder.none,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(80)),
+                              color: RingyColors.lightWhite,
+                              border: Border.all(color: Colors.black12)),
+                          child: Row(
+                            children: [
+                              InkWell(
+                                  onTap: () => {},
+                                  child: const Icon(
+                                      Icons.emoji_emotions_outlined)),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  maxLines: 4,
+                                  minLines: 1,
+                                  keyboardType: TextInputType.multiline,
+                                  controller: _editingController,
+                                  decoration: const InputDecoration(
+                                    hintText: StringsEn.enterMessage,
+                                    hintStyle: TextStyle(color: Colors.black54),
+                                    border: InputBorder.none,
+                                  ),
+                                  onChanged: (text) {
+                                    msgEntered = text;
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
-                          onChanged: (text) {
-                            msgEntered = text;
-                          },
                         ),
                       ),
                       const SizedBox(
                         width: 15,
                       ),
-                      FloatingActionButton(
-                        onPressed: () {
-                          sendSimpleChat(
-                              context, msgEntered, chatListBloc, messages,dataTravel);
-                          // scrollController.animateTo(
-                          //     scrollController.position.maxScrollExtent + 1000,
-                          //     duration: const Duration(milliseconds: 300),
-                          //     curve: Curves.easeOut);
-                          _editingController.clear();
+                      InkWell(
+                        onTap: () {
+                          if (msgEntered != "") {
+                            sendSimpleChat(context, msgEntered, chatListBloc,
+                                messages, dataTravel);
+                            _editingController.clear();
+                          }
                         },
-                        child: const Icon(
-                          Icons.send,
-                          color: Colors.white,
-                          size: 18,
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(1)),
+                            color: RingyColors.lightWhite,
+                            // border: Border.all(color: Colors.black12)
+                          ),
+                          child: const Icon(
+                            Icons.send,
+                            size: 18,
+                          ),
                         ),
-                        backgroundColor: Colors.blue,
-                        elevation: 0,
                       ),
                     ],
                   ),
@@ -251,72 +195,22 @@ class ChatScreen extends StatelessWidget {
       padding: const EdgeInsets.only(top: 10, bottom: 10),
       itemBuilder: (context, index) {
         final revereIndex = messages.length - 1 - index;
-        // final item = messages[revereIndex];
-        return _buildChatList(messages,revereIndex);
+        return ChatItemDesign(messages, revereIndex);
       },
     );
   }
 
-  Widget _buildChatList(List<ChatModel> messages,int index){
-    return Container(
-      padding:
-      const EdgeInsets.only(left: 14, right: 14, top: 10, bottom: 10),
-      child: Align(
-        //https://ringy.jp:22000/GetRingo2oChat/6152f067d8eda876c8d49cbe/61aef7d8d5d2971bb4c8b890/100/5d4c07fb030f5d0600bf5c03/0
-        alignment:
-        (messages[index].senderId?.id != "6152f067d8eda876c8d49cbe"
-            ? Alignment.topLeft
-            : Alignment.topRight),
-
-        child: Padding(
-          padding:
-          messages[index].senderId?.id == "6152f067d8eda876c8d49cbe"
-              ? const EdgeInsets.only(left: 40)
-              : const EdgeInsets.only(right: 40),
-          child: Container(
-              decoration: BoxDecoration(
-                borderRadius: messages[index].senderId?.id !=
-                    "6152f067d8eda876c8d49cbe"
-                    ? const BorderRadius.only(
-                    topRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20))
-                    : const BorderRadius.only(
-                    topRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(20),
-                    topLeft: Radius.circular(20)),
-                color: (messages[index].senderId?.id !=
-                    "6152f067d8eda876c8d49cbe"
-                    ? Colors.grey.shade200
-                    : Colors.blue[200]),
-              ),
-              padding: const EdgeInsets.all(14),
-              child: messages[index].messageType == Constants.VIDEO_MSG
-                  ? VideoMessageView(messagesList: messages, index: index)
-                  : messages[index].messageType == Constants.IMAGE_MSG
-                  ? ImageMessageView(
-                  messagesList: messages, index: index)
-              // : messages[index].messageType == Constants.AUDIO_MSG
-              //     ? AudioMessageView(
-              //         messagesList: messages,
-              //         index: index,
-              //       )
-                  : NormalMessageView(
-                messagesList: messages,
-                index: index,
-              )),
-        ),
-      ),
-    );
-  }
-
-  void sendSimpleChat(BuildContext context, String msgEntered,
-      ChatListBloc chatListBloc, List<ChatModel> messages,TmpDataTravel tmpDataTravel) {
-    var senderMainUserId = "6152eec97fa31675f62b8089";
+  void sendSimpleChat(
+      BuildContext context,
+      String msgEntered,
+      ChatListBloc chatListBloc,
+      List<ChatModel> messages,
+      TmpDataTravel tmpDataTravel) {
+    var senderMainUserId = Constants.MY_MAIN_USER_ID;
     var receiverMainUserId = tmpDataTravel.mainUserId;
-    String sId = "6152f067d8eda876c8d49cbe";
+    String sId = Constants.MY_ID;
     String rId = tmpDataTravel.recieverId;
-    String pId = "5d4c07fb030f5d0600bf5c03";
+    String pId = Constants.projectId;
     SenderId receiverIdObj = SenderId();
     receiverIdObj.id = rId;
 
@@ -324,7 +218,6 @@ class ChatScreen extends StatelessWidget {
     senderIdObj.id = sId;
 
     ChatModel chatModel = ChatModel();
-    // chatModel.sId = "";
     chatModel.receiverId = receiverIdObj;
     chatModel.senderId = senderIdObj;
     chatModel.message = EncryptData.encryptAES(msgEntered, senderIdObj.id);
@@ -342,11 +235,120 @@ class ChatScreen extends StatelessWidget {
     chatListBloc.add(UpdateChatsEvent(messages));
 
     BlocProvider.of<SendChatBloc>(context).repository.sendMessage(chatModel);
-    /* Timer.periodic(Duration(seconds: 5), (_) {
-      // this code runs after every 5 second. Good to use for Stopwatches
-      chatListBloc.repository.getChats();
-    });*/
+  }
+
+
+
+  void _showBottomMenu(BuildContext context) {
+    FocusScope.of(context).unfocus();
+    final items = <Widget>[
+      ListTile(
+        dense: true,
+        leading: const Icon(Icons.photo_camera),
+        title: const Text('Camera'),
+        onTap: () {
+          _getFromCamera(context);
+        },
+      ),
+      const Divider(height: 1,),
+      ListTile(
+        dense: true,
+        leading: const Icon(Icons.photo_library),
+        title: const Text('Gallery'),
+        onTap: () {
+          _getFromGallery(context);
+        },
+      ),
+      const Divider(height: 1,),
+      ListTile(
+        dense: true,
+        leading: const Icon(Icons.file_copy),
+        title: const Text('Files'),
+        onTap: () {
+          _getFile(context);
+        },
+      ),
+      const Divider(height: 1,),
+      ListTile(
+        dense: true,
+        leading: const Icon(Icons.videocam_outlined),
+        title: const Text('Videos'),
+        onTap: () {
+          _getVideo(context);
+        },
+      ),
+      const Divider(height: 1,),
+      ListTile(
+        dense: true,
+        leading: const Icon(Icons.location_on_outlined),
+        title: const Text('Location'),
+        onTap: () {},
+      ),
+    ];
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        enableDrag: false,
+        builder: (context) => Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              decoration: RingyStyles.decor5,
+              margin: const EdgeInsets.all(10),
+              child: Wrap(
+                children: items,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.fromLTRB(15,5,15,15),
+              alignment: Alignment.bottomRight,
+              child: InkWell(
+                onTap: () => {Navigator.pop(context)},
+                child: const CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.white,
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.black38,
+                      size: 30,
+                    )),
+              ),
+            )
+          ],
+        ));
+  }
+
+  _getFromCamera(BuildContext context) async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+    VxToast.show(context, msg: photo!.path);
+  }
+  _getFromGallery(BuildContext context) async {
+    final ImagePicker _picker = ImagePicker();
+    List<XFile>? photo = await _picker.pickMultiImage();
+    // final XFile? photo = await _picker.pickImage(source: ImageSource.gallery);
+    VxToast.show(context, msg: photo!.length.toString());
+  }
+  _getVideo(BuildContext context) async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? video = await _picker.pickVideo(source: ImageSource.gallery);
+    VxToast.show(context, msg: video!.name);
+  }
+  _getFile(BuildContext context) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ["xlsx", "xls", "doc", "docx", "ppt", "pptx", "pdf", "txt"],
+    );
+
+    if (result != null) {
+      File file = File(result.files.single.path!);
+    } else {
+      // User canceled the picker
+    }
+    VxToast.show(context, msg: result!.files.single.path!);
   }
 }
 
-// Decrypt data
+

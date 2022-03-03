@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:ringy_flutter/ringy/resources/colors.dart';
 import './injections.dart' as di;
 import 'package:ringy_flutter/ringy/presentation/routes/router.dart';
 
@@ -22,11 +23,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Ringy',
       debugShowCheckedModeBanner: false,
+      theme: _baseTheme,
       routerDelegate: _router.delegate(),
       routeInformationParser: _router.defaultRouteParser(),
     );
   }
 }
+
+ThemeData _baseTheme = ThemeData(
+    bottomSheetTheme: BottomSheetThemeData(backgroundColor: RingyColors.overlay)
+);
 
 class MyHttpOverrides extends HttpOverrides{
   @override

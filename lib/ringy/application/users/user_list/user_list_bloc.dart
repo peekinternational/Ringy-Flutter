@@ -19,10 +19,12 @@ class UserListBloc extends Bloc<UserListEvent, UserListState> {
   }
 
   FutureOr<void> _onEvent(GetUsersEvent event, Emitter<UserListState> emit) async {
+    // emit(LoadingState());
+    // var resultdb = await repository.getUsersListFromDb();
+    // emit(resultdb.fold((l) => LoadingState(), (r) => LoadedState(users: r)));
+
     emit(LoadingState());
-    print("UserListBloc");
     var result = await repository.getUsersList(event.projectId, event.userId);
-   // print(result);
     emit(result.fold((l) => ErrorState(), (r) => LoadedState(users: r)));
   }
   FutureOr<void> _onEventUpdate(UpdateUsersEvent event, Emitter<UserListState> emit) async {

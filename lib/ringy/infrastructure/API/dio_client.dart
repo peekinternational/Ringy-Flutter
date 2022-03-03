@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:ringy_flutter/ringy/infrastructure/API/api_content.dart';
 import 'logging.dart';
 
@@ -25,12 +26,26 @@ class DioClient
         connectTimeout: 5000,
         receiveTimeout: 3000,
       );
-      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-          (HttpClient client) {
-        client.badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
-        return client;
-      };
+     // httpServletResponse?.setHeader("Access-Control-Allow-Origin", "*")
+     // httpServletResponse?.setHeader("Access-Control-Allow-Headers", "*")
+     // httpServletResponse?.setHeader("Access-Control-Allow-Methods", "*")
+     // httpServletResponse?.setHeader("Access-Control-Allow-Credentials", "true")
+
+
+    //  dio.options.headers[
+    // { 'Access-Control-Allow-Origin': '*',
+    //   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE' ,
+    //   'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
+    //   'Access-Control-Allow-Credentials': true
+    //    } ];
+      if (!kIsWeb) {
+        (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+            (HttpClient client) {
+          client.badCertificateCallback =
+              (X509Certificate cert, String host, int port) => true;
+          return client;
+        };
+      }
       dio.interceptors.add(Logging());
     }
  }

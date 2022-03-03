@@ -26,8 +26,14 @@ class Repository implements IFacade {
 
   @override
   Future<Either<String, List<UsersModel>>> getUsersList(String projectId, String userId) {
-    // TODO: implement getUsersList
     return apiDataSource.getUsersList( projectId, userId);
   }
+
+  @override
+  Future<Either<String, List<UsersModel>>> getUsersListFromDb() {
+    return apiDataSource.getUsersListFromDb();
+  }
+
+
 
 }

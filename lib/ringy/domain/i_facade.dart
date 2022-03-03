@@ -9,4 +9,8 @@ abstract class IFacade{
   Future<Either<String,ChatModel>> sendMessage(ChatModel model);
   Future<Either<String,List<GetUserRingModel>>> getRingList(String projectId,String userId);
 
+
+
+  Future<Either<String,List<UsersModel>>> getUsersListFromDb();
+
 }

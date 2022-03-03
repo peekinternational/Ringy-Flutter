@@ -22,9 +22,7 @@ class SendChatBloc extends Bloc<SendChatEvent, SendChatState> {
   FutureOr<void> _onEvent(SendChatsEvent event,
       Emitter<SendChatState> emit) async {
     emit(LoadingState());
-    print("pppppppppppppppp");
     var result = await repository.sendMessage(event.model);
-    print(result);
     emit(result.fold((l) => ErrorState(), (r) =>
         LoadedState(chats: r)));
   }

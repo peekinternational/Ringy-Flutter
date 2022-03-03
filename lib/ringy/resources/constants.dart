@@ -15,6 +15,7 @@ class Constants {
 
 
   static const String MY_ID = "6152f067d8eda876c8d49cbe";
+  static const String MY_MAIN_USER_ID = "6152eec97fa31675f62b8089";
   static const String projectId = "5d4c07fb030f5d0600bf5c03";
 
 
@@ -22,7 +23,6 @@ class Constants {
   static const int friendsPage = 1;
   static const int invitePage = 2;
   static const int searchPage = 3;
-
 
   // static const int messageTypeAudio = 1;
   // static const int messageTypeLocation = 1;

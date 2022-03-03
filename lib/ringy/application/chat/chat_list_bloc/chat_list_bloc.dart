@@ -21,9 +21,7 @@ class ChatListBloc extends Bloc<ChatListEvent, ChatListState> {
 
   FutureOr<void> _onEvent(GetChatsEvent event, Emitter<ChatListState> emit) async {
     emit(ChatsLoadingState());
-    print("pppppppppppppppp");
     var result = await repository.getChats(event.senderId,event.receiverId,event.limit);
-    print(result);
     emit(result.fold((l) => ChatListErrorState(), (r) => ChatListLoadedState(chats: r)));
   }
   FutureOr<void> _onEventUpdate(UpdateChatsEvent event, Emitter<ChatListState> emit) async {
