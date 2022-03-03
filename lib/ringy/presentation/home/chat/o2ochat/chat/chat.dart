@@ -248,6 +248,7 @@ class ChatScreen extends StatelessWidget {
         title: const Text('Camera'),
         onTap: () {
           _getFromCamera(context);
+          Navigator.pop(context);
         },
       ),
       const Divider(height: 1,),
@@ -257,6 +258,7 @@ class ChatScreen extends StatelessWidget {
         title: const Text('Gallery'),
         onTap: () {
           _getFromGallery(context);
+          Navigator.pop(context);
         },
       ),
       const Divider(height: 1,),
@@ -266,6 +268,7 @@ class ChatScreen extends StatelessWidget {
         title: const Text('Files'),
         onTap: () {
           _getFile(context);
+          Navigator.pop(context);
         },
       ),
       const Divider(height: 1,),
@@ -275,6 +278,7 @@ class ChatScreen extends StatelessWidget {
         title: const Text('Videos'),
         onTap: () {
           _getVideo(context);
+          Navigator.pop(context);
         },
       ),
       const Divider(height: 1,),
@@ -282,7 +286,9 @@ class ChatScreen extends StatelessWidget {
         dense: true,
         leading: const Icon(Icons.location_on_outlined),
         title: const Text('Location'),
-        onTap: () {},
+        onTap: () {
+          Navigator.pop(context);
+        },
       ),
     ];
     showModalBottomSheet(
